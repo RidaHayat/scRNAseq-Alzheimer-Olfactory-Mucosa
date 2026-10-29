@@ -1,5 +1,0 @@
-*.Rmd linguist-detectable=true
-*.Rmd linguist-language=R
-*.tsv linguist-vendored
-*.csv linguist-vendored
-*.pdf binary
