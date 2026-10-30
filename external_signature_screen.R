@@ -91,13 +91,14 @@ results <- do.call(rbind, lapply(c("AD1", "Control2"), summarize_sample))
 write.csv(results, file.path(output_dir, "external_signature_screen.csv"),
           row.names = FALSE)
 
-pct <- matrix(results$pct_cells_detected, nrow = nrow(gene_panel), ncol = 2,
-              dimnames = list(gene_panel$gene, c("AD1", "Control2")))
-available <- rowSums(is.na(pct)) == 0
+pct <- matrix(results$pct_cells_detected, nrow = 2, ncol = nrow(gene_panel),
+              byrow = TRUE,
+              dimnames = list(c("AD1", "Control2"), gene_panel$gene))
+available <- colSums(is.na(pct)) == 0
 png(file.path(figure_dir, "published_gene_screen.png"),
     width = 2200, height = 1400, res = 220)
 par(mar = c(10, 5, 4, 1))
-barplot(pct[available, , drop = FALSE], beside = TRUE, las = 2,
+barplot(pct[, available, drop = FALSE], beside = TRUE, las = 2,
         col = c("#B44A4A", "#4277A8"),
         ylab = "QC-passed cells with detected transcript (%)",
         main = "Published olfactory AD genes in the two local samples",
