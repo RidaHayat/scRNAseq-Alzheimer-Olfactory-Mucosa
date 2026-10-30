@@ -1,40 +1,35 @@
-# Single-cell RNA-seq analysis of Alzheimer’s disease olfactory mucosa
+# Single-cell RNA-seq of Alzheimer’s disease olfactory mucosa
 
-This project compares olfactory mucosa samples labeled `AD1` and `Control2`. The R script uses Seurat for quality control, normalization, dimensionality reduction, clustering, and gene-expression analysis. Figures from the analysis are included below.
+This project analyzes two 10x single-cell libraries labelled `AD1` and `Control2`. It covers basic quality control, clustering, cluster marker genes, and a small check of genes reported in a recent olfactory Alzheimer’s study.
 
-## 1. Methods and parameters
+## Data and limits
 
-| Step | Method | Parameters used in the script |
-| --- | --- | --- |
-| Data input | `Seurat::Read10X`, `CreateSeuratObject` | Input folders: `AD1` and `Control2`; `min.cells = 3`; `min.features = 100` |
-| QC measurements | `PercentageFeatureSet` | Mitochondrial `^MT-`; ribosomal `^RP[SL]`; hemoglobin `^HB[^(P)]` |
-| Cell filtering | `subset()` | `nFeature_RNA > 200`; `nFeature_RNA < 5000`; `percent.mito < 10` |
-| Normalization | `NormalizeData` | `normalization.method = "LogNormalize"`; `scale.factor = 10000` |
-| Variable genes and scaling | `FindVariableFeatures`, `ScaleData` | `selection.method = "vst"`; `nfeatures = 2000`; scales all genes |
-| PCA and UMAP | `RunPCA`, `ElbowPlot`, `RunUMAP` | Elbow plot through 40 PCs; dimensions 1–25 used for UMAP and neighbor finding |
-| Clustering | `FindNeighbors`, `FindClusters`, `clustree` | Resolutions 0.1–0.8 by 0.1; resolution 0.8 is shown in the final cluster UMAP |
-| Cluster markers | `FindAllMarkers` | `min.pct = 0.25`; `only.pos = TRUE`; script filters to `p_val_adj < 0.05` |
-| AD1 vs Control2 | `FindMarkers` | Script compares the two sample identities. A later call specifies `test.use = "wilcox"` and filters adjusted p-values below 0.05; confirm its grouping and identity settings before interpreting its output. |
+The local matrices contain one AD sample and one control sample. After filtering, the analysis retains **2,003 AD1 cells** and **1,715 Control2 cells** (**3,718 total**). Cells from one person are not independent biological replicates. This dataset can show cell-level patterns, but it cannot support a reliable disease-level differential-expression test or biomarker claim.
 
-## 2. Results and figures
+The source accession and sample metadata are not included in this repository. The count matrices, archives, and other input data are excluded from Git. See [data/README.md](data/README.md) for how to run the scripts with local files.
 
-### Cell numbers after filtering
+## Methods
 
-The script records **2,003 retained AD1 cells** and **1,715 retained Control2 cells**, for **3,718 cells total**. It does not include the initial cell totals in its analysis output, so removal percentages are not reported here.
+| Step | Method and settings |
+| --- | --- |
+| Input | 10x `Read10X`; `CreateSeuratObject(min.cells = 3, min.features = 100)` |
+| QC metrics | Mitochondrial `^MT-`; ribosomal `^RP[SL]`; hemoglobin `^HB[^(P)]` |
+| Cell filters | `200 < nFeature_RNA < 5,000`; mitochondrial fraction `< 10%` |
+| Normalize | Seurat `LogNormalize`, scale factor `10,000` |
+| Variable genes | `vst`, 2,000 genes; scale variable genes |
+| PCA and UMAP | 40 PCs calculated; dimensions 1–25 used for UMAP and neighbors |
+| Clustering | Seurat graph clustering at resolutions 0.1–0.8; compare with `clustree`; display resolution 0.8 |
+| Cluster markers | `FindAllMarkers`, Wilcoxon test, `min.pct = 0.25`, positive markers, adjusted p < 0.05 |
 
-### Variable and abundant genes
+The cluster marker table describes differences between clusters in this dataset. It does not identify disease biomarkers. The condition-level `FindMarkers` tests from the earlier script were removed because one sample per group cannot provide biological replication; treating thousands of cells as independent patients would overstate evidence.
 
-The variable-feature plot labels the genes selected as the most variable in the merged analysis. The separate top-gene plots show the most abundant transcripts within each sample. The script comments that `MALAT1` ranks first and `MT2A` third in Control2. These are abundance rankings; the figures do not establish a statistically significant AD1-versus-Control2 change.
+## Results
 
-### Clusters and cell types
+- The provided QC results retain 3,718 cells across the two libraries.
+- The earlier clustering produced 10 groups at resolution 0.8. The marker genes can help with follow-up cell annotation, but cell identities need to be checked against marker evidence before being reported.
+- The original plots show QC distributions, PCA, UMAP, and cluster stability across resolutions.
 
-The script tests clustering resolutions from 0.1 to 0.8 and plots the resolution 0.8 result. The included UMAP and clustree show the cluster layout and how assignments change across resolutions. The script and figures included here do not provide cell-type labels or a SingleR annotation workflow, so specific cell identities are not assigned in this project summary.
-
-## 3. Figures
-
-### Quality control and gene expression
-
-The feature scatter plots compare the number of detected genes and RNA counts per cell. The violin plots show QC distributions, including detected genes/counts and transcript fractions. The top-gene plots show the most abundant transcripts in each sample.
+### QC and expression figures
 
 | AD1 | Control2 |
 | --- | --- |
@@ -45,8 +40,6 @@ The feature scatter plots compare the number of detected genes and RNA counts pe
 
 ### Variable genes and dimensionality reduction
 
-The variable-feature plot shows selected variable genes. PCA displays the principal-component structure, the feature plot colors the PCA by detected gene count, and the elbow plot shows the variance drop-off used to choose dimensions.
-
 ![Variable features](figures/05_variable_features.png)
 
 ![PCA plot](figures/06_pca_plot.jpeg)
@@ -55,19 +48,39 @@ The variable-feature plot shows selected variable genes. PCA displays the princi
 
 ![Elbow plot](figures/08_elbow_plot.jpeg)
 
-### UMAP and clustering
-
-The condition UMAP colors cells by sample. The clustree plot compares cluster assignments at different resolutions. The final plot shows cluster labels at resolution 0.8.
+### UMAP and clusters
 
 ![UMAP by sample](figures/09_umap_condition.jpeg)
 
 ![Clustree across resolutions](figures/10_clustree.jpeg)
 
-![UMAP clusters at resolution 0.8](figures/11_umap_clusters_res08.jpeg)
+![Clusters at resolution 0.8](figures/11_umap_clusters_res08.jpeg)
 
-## Files and data
+## Added analysis: genes from a recent olfactory AD study
 
-- `scRNAseq_Alzheimers_Olfactory_Mucosa.R` — analysis script; it expects 10X input folders named `AD1` and `Control2` alongside the script.
-- `figures/` — figures displayed in this README.
+I checked expression of seven genes highlighted in a recent study of olfactory epithelium from **22 donors**: six controls, nine people with preclinical AD, and seven with clinical AD. That study reported cell-type-specific changes in olfactory sensory neurons and myeloid cells ([D’Anniballe et al., 2026](https://www.nature.com/articles/s41467-026-70099-7); public data: [GEO GSE302937](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE302937)).
 
-The count matrices and archives are not included.
+In the local data, `AKR1B1` was detected in 75.5% of AD1 cells and 85.7% of Control2 cells; `LBH` in 14.2% and 15.7%; `EGR3` in 2.1% and 1.3%; and `MIF` in 92.2% and 98.2%. `CERT1`, `HLA-DQA2`, and `GZMA` were absent from the filtered feature matrix. These are descriptive percentages across all cells, not cell-type-specific tests or evidence of an AD effect.
+
+![Detection of genes reported in the independent olfactory AD study](results/figures/published_gene_screen.png)
+
+The newer cohort is a useful next step for a stronger replication: analyze its donor-level counts with pseudobulk methods, then compare cell-type-specific results. Do not combine cell counts across donors as if they were independent participants.
+
+## Run the analysis
+
+Install R packages `Seurat`, `ggplot2`, `clustree`, and `Matrix`. Place the 10x folders at `data/AD1/` and `data/Control2/`, or point `DATA_DIR` to a folder containing both. Do not commit the data files.
+
+```bash
+Rscript scRNAseq_Alzheimers_Olfactory_Mucosa.R
+Rscript external_signature_screen.R
+```
+
+The first script writes QC summaries, exploratory cluster markers, and current PCA/UMAP/clustree figures under `results/`. The second writes `results/external_signature_screen.csv` and the figure shown above. Both scripts use one sample per condition and therefore do not calculate condition-level significance.
+
+## Files
+
+- `scRNAseq_Alzheimers_Olfactory_Mucosa.R` — portable Seurat workflow.
+- `external_signature_screen.R` — descriptive screen of selected genes from the 2026 olfactory AD study.
+- `figures/` — figures from the original analysis.
+- `results/` — added gene screen and outputs generated by the Seurat workflow.
+- `data/README.md` — local input instructions.

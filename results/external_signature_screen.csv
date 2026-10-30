@@ -1,0 +1,15 @@
+"sample","condition_label","gene","reported_context","qc_pass_cells","pct_cells_detected","mean_log1p_normalized_expression","gene_found"
+"AD1","AD1","AKR1B1","Olfactory sensory neurons",2003,75.4867698452321,0.637398786398178,TRUE
+"AD1","AD1","CERT1","Olfactory sensory neurons",2003,NA,NA,FALSE
+"AD1","AD1","LBH","Olfactory sensory neurons",2003,14.2286570144783,0.0801570783688839,TRUE
+"AD1","AD1","HLA-DQA2","Myeloid cells",2003,NA,NA,FALSE
+"AD1","AD1","EGR3","Myeloid cells",2003,2.09685471792312,0.0133659578558679,TRUE
+"AD1","AD1","GZMA","Neuron-immune interaction",2003,NA,NA,FALSE
+"AD1","AD1","MIF","Neuron-immune interaction",2003,92.1617573639541,1.03980555744212,TRUE
+"Control2","Control2","AKR1B1","Olfactory sensory neurons",1715,85.7142857142857,0.805641255167633,TRUE
+"Control2","Control2","CERT1","Olfactory sensory neurons",1715,NA,NA,FALSE
+"Control2","Control2","LBH","Olfactory sensory neurons",1715,15.6851311953353,0.078745656053913,TRUE
+"Control2","Control2","HLA-DQA2","Myeloid cells",1715,NA,NA,FALSE
+"Control2","Control2","EGR3","Myeloid cells",1715,1.28279883381924,0.0064980142981986,TRUE
+"Control2","Control2","GZMA","Neuron-immune interaction",1715,NA,NA,FALSE
+"Control2","Control2","MIF","Neuron-immune interaction",1715,98.1924198250729,1.45947505992376,TRUE
